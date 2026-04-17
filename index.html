@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>大磊聯合建築師事務所 — 盲盒尋寶圖</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0ece0;font-family:sans-serif;}
+.wrap{max-width:700px;margin:auto;padding-bottom:2rem;}
+
+.qr-bar{background:#1e1e12;padding:.8rem 1rem;display:flex;align-items:center;gap:1rem;border-bottom:2px solid #3a3a2a;}
+.qr-img{flex-shrink:0;background:#fff;padding:5px;border-radius:2px;width:80px;height:80px;display:flex;align-items:center;justify-content:center;}
+.qr-img img{width:70px;height:70px;display:block;}
+.qr-text{color:#c8c0a0;font-family:monospace;flex:1;}
+.qr-t{font-size:13px;font-weight:500;letter-spacing:1px;margin-bottom:4px;color:#e8e0c0;}
+.qr-s{font-size:10px;color:#989870;line-height:1.9;}
+.qr-s b{color:#c8b870;}
+.sync-badge{display:inline-block;margin-top:6px;font-size:9px;font-family:monospace;padding:2px 8px;border-radius:1px;background:#2a3a1a;color:#8aba60;border:1px solid #4a6a2a;}
+.sync-badge.err{background:#3a1a1a;color:#ba6060;border-color:#6a2a2a;}
+
+.strip{width:100%;overflow:hidden;height:80px;border-bottom:2px solid #3a3a2a;background:#141410;}
+.strip-t{display:flex;height:100%;width:max-content;animation:sc 34s linear infinite;}
+.strip-t:hover{animation-play-state:paused;}
+@keyframes sc{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.si{position:relative;width:160px;height:80px;flex-shrink:0;overflow:hidden;border-right:1px solid rgba(255,255,255,.07);}
+.si img{width:100%;height:100%;object-fit:cover;filter:brightness(.48) saturate(.6);}
+.si span{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#d0c8a8;font-size:9px;padding:8px 6px 3px;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.si-tag{position:absolute;top:4px;left:5px;background:rgba(175,148,72,.88);color:#fff;font-size:8px;font-family:monospace;padding:1px 4px;border-radius:1px;}
+
+.cad{border:2px solid #3a3a2a;border-top:none;background:#f8f4e8;font-family:monospace;}
+.cad-top{background:#1e1e12;color:#c8c0a0;padding:4px 14px;font-size:13px;font-weight:500;letter-spacing:3px;text-align:center;}
+.cad-grid{display:grid;grid-template-columns:65px 1fr 65px;border-bottom:1.5px solid #3a3a2a;}
+.cad-c{padding:6px 8px;font-size:11px;color:#3a3a1a;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.6;border-right:1.5px solid #3a3a2a;}
+.cad-c:last-child{border-right:none;}
+.cad-main{font-size:19px;font-weight:500;letter-spacing:4px;color:#181808;}
+.cad-sub{display:grid;grid-template-columns:1fr 1fr 1fr;}
+.cad-sc{padding:4px 8px;color:#3a3a1a;border-right:1.5px solid #3a3a2a;text-align:center;font-size:10px;}
+.cad-sc:last-child{border-right:none;}
+
+.body{padding:1rem;}
+
+.status-bar{background:#f8f4e8;border:1.5px solid #a8a070;border-radius:3px;padding:.7rem 1rem;margin-bottom:.8rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.status-left{font-size:10px;font-family:monospace;color:#585840;}
+.status-count{font-size:18px;font-weight:500;color:#3a2a0a;font-family:monospace;}
+.btn-sync{padding:4px 12px;background:#1e1e12;color:#c8c0a0;border:none;border-radius:2px;font-size:10px;cursor:pointer;font-family:monospace;letter-spacing:1px;}
+.btn-sync:hover{background:#3a3a1a;}
+
+.q-box{background:#f8f4e8;border:1.5px solid #a8a070;border-radius:3px;padding:.7rem 1rem;margin-bottom:.8rem;min-height:50px;}
+.lbl{font-size:10px;color:#686850;font-family:monospace;letter-spacing:1px;margin-bottom:6px;display:block;}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.chip{border:1px solid #a8a070;border-radius:2px;padding:3px 9px;font-size:11px;font-family:monospace;color:#2a2a0a;display:flex;align-items:center;gap:4px;cursor:pointer;transition:background .15s;}
+.chip-no{font-weight:500;color:#785a18;}
+.hint{font-size:11px;color:#989870;font-family:monospace;}
+
+.game-area{background:#f8f4e8;border:1.5px solid #3a3a2a;border-radius:3px;padding:1rem;margin-bottom:.8rem;}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;gap:.5rem;flex-wrap:wrap;}
+.game-lbl{font-size:10px;font-family:monospace;color:#585840;}
+.play-btn{padding:6px 16px;background:#3a2a0a;color:#e8d890;border:none;border-radius:2px;font-size:11px;cursor:pointer;font-family:monospace;letter-spacing:1px;}
+.play-btn:hover{background:#5a4a1a;}
+.play-btn:disabled{background:#aaa;color:#fff;cursor:default;}
+
+#gameCanvas{width:100%;display:block;border:1px solid #c8c090;border-radius:2px;background:#fffef6;}
+
+.result-reveal{margin-top:.8rem;display:none;}
+.result-reveal.show{display:block;}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;margin-top:.6rem;}
+.rev-card{border:1.5px solid #8a6a10;border-radius:3px;padding:8px;background:#fffbe8;text-align:center;}
+.rc-no{font-size:9px;color:#888868;font-family:monospace;margin-bottom:2px;}
+.rc-name{font-size:12px;font-weight:500;color:#181808;margin-bottom:3px;}
+.rc-arch{font-size:13px;color:#282818;}
+.rc-en{font-size:9px;color:#888868;margin-bottom:3px;}
+.rc-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-family:monospace;margin-bottom:3px;}
+.bf{background:#e1f5ee;color:#0f6e56;border:1px solid #9fe1cb;}
+.bc{background:#e6f1fb;color:#185fa5;border:1px solid #b5d4f4;}
+.bb{background:#faece7;color:#993c1d;border:1px solid #f5c4b3;}
+.rc-desc{font-size:10px;color:#585840;line-height:1.5;}
+
+.btn-reset{margin-top:.6rem;padding:6px 16px;background:transparent;border:1.5px solid #a8a070;border-radius:2px;font-size:11px;color:#585840;cursor:pointer;font-family:monospace;}
+.btn-reset:hover{background:#e4dfbc;}
+
+.cad-ft{border:2px solid #3a3a2a;border-top:none;background:#1e1e12;color:#686850;font-size:9px;font-family:monospace;padding:4px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- QR + 說明 -->
+<div class="qr-bar">
+  <div class="qr-img">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Feclectic-taffy-22e109.netlify.app&color=1e1e12&bgcolor=ffffff&qzone=1" alt="QR Code"/>
+  </div>
+  <div class="qr-text">
+    <div class="qr-t">掃碼登記入場</div>
+    <div class="qr-s">
+      <b>①</b> 掃描 QR Code 填寫姓名送出<br>
+      <b>②</b> 系統每 5 秒自動同步名單<br>
+      <b>③</b> 點選姓名 → 按「開始爬！」<br>
+      <b>④</b> 對照結果卡領取專屬建築盲盒
+    </div>
+    <span class="sync-badge" id="syncBadge">● 等待同步...</span>
+  </div>
+</div>
+
+<!-- 作品輪播 -->
+<div class="strip"><div class="strip-t" id="st"></div></div>
+
+<!-- 地籍圖標頭 -->
+<div class="cad">
+  <div class="cad-top">大磊聯合建築師事務所</div>
+  <div class="cad-grid">
+    <div class="cad-c">地號<br>區域</div>
+    <div class="cad-c" style="flex-direction:column;gap:1px;">
+      <div class="cad-main">盲盒尋寶圖</div>
+    </div>
+    <div class="cad-c">比例尺<br>1:1</div>
+  </div>
+  <div class="cad-sub">
+    <div class="cad-sc">地段：吸碳專區</div>
+    <div class="cad-sc">地目：碳暈之地</div>
+    <div class="cad-sc">民國　與你相會的那年</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 同步狀態列 -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span class="lbl" style="margin:0;">▌ 已報到人數</span>
+      <span class="status-count" id="countDisplay">0</span> 人
+    </div>
+    <button class="btn-sync" onclick="fetchNames()">立即同步</button>
+  </div>
+
+  <!-- 名單 -->
+  <div class="q-box">
+    <span class="lbl">▌ 已登記名單（點選姓名開始爬梯子）</span>
+    <div class="chips" id="chips"><span class="hint">等待同仁掃碼登記…</span></div>
+  </div>
+
+  <!-- 遊戲區 -->
+  <div class="game-area" id="gameArea" style="display:none;">
+    <div class="game-header">
+      <span class="game-lbl" id="gameLbl">▌ 點選上方姓名，再按「開始爬！」</span>
+      <button class="play-btn" id="playBtn" onclick="startClimb()" disabled>開始爬！</button>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="result-reveal" id="resultReveal">
+      <span class="lbl">▌ 全員人設揭曉</span>
+      <div class="rev-grid" id="revGrid"></div>
+    </div>
+    <button class="btn-reset" onclick="resetGame()">重置遊戲</button>
+  </div>
+
+</div>
+
+<div class="cad-ft">
+  <span>701 台南市東區德光街15巷1號</span>
+  <span>06-289-8956</span>
+  <span>jaujshih@ms24.hinet.net</span>
+</div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbxHB3e8gVdDujKueGCXK_EvePB7hBDq7Dx7whNYf5eamKzJj-pyD4nzhWa3ggyYP4kb/exec';
+const SYNC_INTERVAL = 5000;
+
+const RES=[
+  {title:'居富開發．居建築',img:'https://joeshih.com/storage/portfolios/November2018/lIn8sIbRTfwnrDzFh5J5.jpg'},
+  {title:'居富開發．律建築',img:'https://joeshih.com/storage/portfolios/November2018/g4gj7Ldd3xFVbClqwvjS.jpg'},
+  {title:'慶旺建設．聚馥',img:'https://joeshih.com/storage/portfolios/November2018/iOV8wmODBdUw6ezeT9Zi.jpg'},
+  {title:'鼎宇建設 美術之星',img:'https://joeshih.com/storage/portfolios/November2018/BaWsM46C6yxvsXLTjlq8.jpg'},
+  {title:'鼎宇建設．美術雅築',img:'https://joeshih.com/storage/portfolios/November2018/O8d7UN1xRXQwKq9svDTy.jpg'},
+  {title:'友友建設．百達翡麗',img:'https://joeshih.com/storage/portfolios/November2018/GQ6TxgUfYUp4Hmi9kMsZ.jpg'},
+  {title:'南統建設．湖畔城堡',img:'https://joeshih.com/storage/portfolios/November2018/S2tSXah9Ms6JFzjM5jAv.jpg'},
+  {title:'居富開發．人本自然',img:'https://joeshih.com/storage/portfolios/November2018/NDmL0JNJm7ODFMvY1dY1.jpg'},
+];
+const st=document.getElementById('st');
+[...RES,...RES].forEach(p=>{
+  const d=document.createElement('div');d.className='si';
+  d.innerHTML=`<span class="si-tag">住宅類</span><img src="${p.img}" loading="lazy"><span>${p.title}</span>`;
+  st.appendChild(d);
+});
+
+const BOXES=[
+  {id:'01',name:'清水模',en:'Concrete',type:'f',desc:'純粹無飾，追求本質'},
+  {id:'02',name:'自然採光',en:'Natural Light',type:'f',desc:'光影流動，空間呼吸'},
+  {id:'03',name:'比例尺',en:'Scale',type:'f',desc:'精準測量，尺度掌控'},
+  {id:'04',name:'玻璃幕牆',en:'Curtain Wall',type:'f',desc:'透明邊界，內外共融'},
+  {id:'05',name:'垂直綠化',en:'Greenery',type:'f',desc:'自然攀升，生態延伸'},
+  {id:'06',name:'留白',en:'Negative Space',type:'f',desc:'少即是多，虛實相生'},
+  {id:'07',name:'透水磚',en:'Permeable',type:'f',desc:'滲透大地，與水共存'},
+  {id:'08',name:'剖面圖',en:'Section',type:'f',desc:'切開空間，一覽究竟'},
+  {id:'09',name:'風通',en:'Ventilation',type:'f',desc:'自然風道，無聲涼意'},
+  {id:'10',name:'草模',en:'Massing',type:'f',desc:'構想成形，初探體量'},
+  {id:'11',name:'黃金比例',en:'Golden Ratio',type:'c',desc:'天地之美，古典法則'},
+  {id:'12',name:'承重牆',en:'Bearing Wall',type:'c',desc:'穩若磐石，默默支撐'},
+  {id:'13',name:'柯比意',en:'Le Corbusier',type:'c',desc:'現代建築，精神宗師'},
+  {id:'14',name:'水平帶窗',en:'Ribbon Window',type:'c',desc:'視野開展，水平流動'},
+  {id:'15',name:'模矩',en:'Modulor',type:'c',desc:'人體尺度，空間基準'},
+  {id:'16',name:'十字圓柱',en:'Cross Column',type:'c',desc:'典雅中心，結構詩意'},
+  {id:'17',name:'丁掛磚',en:'Facing Tile',type:'c',desc:'磚縫之美，歲月紋理'},
+  {id:'18',name:'圖說編號',en:'Drawing Index',type:'c',desc:'有序標記，圖說清晰'},
+  {id:'19',name:'大樣圖',en:'Detail Drawing',type:'c',desc:'細部講究，工藝精神'},
+  {id:'20',name:'平行尺',en:'Parallel Bar',type:'c',desc:'直線守護，端正秩序'},
+  {id:'21',name:'解構主義',en:'Deconstruction',type:'b',desc:'打破框架，重組感官'},
+  {id:'22',name:'耐候鋼',en:'Corten Steel',type:'b',desc:'時間鏽跡，原料之美'},
+  {id:'23',name:'粗獷主義',en:'Brutalism',type:'b',desc:'裸露混凝，力量宣言'},
+  {id:'24',name:'非線性',en:'Non-linear',type:'b',desc:'曲面翻轉，邏輯之外'},
+  {id:'25',name:'外掛結構',en:'Exoskeleton',type:'b',desc:'骨架外露，結構即美'},
+  {id:'26',name:'連通性',en:'Connectivity',type:'b',desc:'串聯空間，動線縱橫'},
+  {id:'27',name:'浮動基礎',en:'Floating',type:'b',desc:'懸浮地表，挑戰重力'},
+  {id:'28',name:'參數化',en:'Parametric',type:'b',desc:'演算生形，數位詩篇'},
+  {id:'29',name:'大理石紋',en:'Marble',type:'b',desc:'石材肌理，奢華靜謐'},
+  {id:'30',name:'竣工圖',en:'As-built',type:'b',desc:'竣工留存，歲月見證'},
+];
+const TL={f:'清爽系',c:'經典系',b:'濃厚系'};
+const TC={f:'bf',c:'bc',b:'bb'};
+
+let participants=[],shuffledBoxes=[],assignments={};
+let selected=null,climbing=false,animDone=[];
+let rungs=[],rightOrder=[];
+let lastCount=0;
+
+function seededShuffle(arr,seed){
+  let a=[...arr],s=seed;
+  const r=()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/4294967296;};
+  for(let i=a.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+async function fetchNames(){
+  const badge=document.getElementById('syncBadge');
+  badge.textContent='● 同步中…';
+  badge.className='sync-badge';
+  try{
+    const res=await fetch(API_URL+'?t='+Date.now());
+    const data=await res.json();
+    const names=data.names||[];
+    const now=new Date().toLocaleTimeString('zh-TW');
+    badge.textContent=`● 已同步 ${now}`;
+    badge.className='sync-badge';
+
+    if(names.length>lastCount){
+      if(!shuffledBoxes.length) shuffledBoxes=seededShuffle(BOXES, Date.now()%99991);
+      for(let i=lastCount;i<Math.min(names.length,30);i++){
+        const name=names[i];
+        if(!participants.find(p=>p.name===name)){
+          const seq=participants.length+1;
+          participants.push({name,seq});
+          assignments[name]=shuffledBoxes[seq-1];
+        }
+      }
+      lastCount=participants.length;
+      buildLadder();
+      renderChips();
+      document.getElementById('gameArea').style.display='block';
+      document.getElementById('countDisplay').textContent=participants.length;
+      drawLadder();
+    } else {
+      document.getElementById('countDisplay').textContent=participants.length;
+    }
+  } catch(e){
+    badge.textContent='● 同步失敗，請檢查網路';
+    badge.className='sync-badge err';
+  }
+}
+
+function buildLadder(){
+  const n=participants.length;
+  let seed=participants.reduce((a,p)=>a+p.seq,0)+7;
+  const r2=()=>{seed=(seed*22695477+1)&0xffffffff;return(seed>>>0)/4294967296;};
+  rungs=[];
+  for(let i=0;i<n-1;i++) if(r2()>0.35) rungs.push({row:i,t:0.38+r2()*0.24});
+  rightOrder=Array.from({length:n},(_,i)=>i);
+  for(const rg of rungs){
+    const a=rightOrder[rg.row],b=rightOrder[rg.row+1];
+    rightOrder[rg.row]=b;rightOrder[rg.row+1]=a;
+  }
+}
+
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+let LX,RX,TY,RH,CW,CH;
+
+function layout(){
+  CW=canvas.offsetWidth||620;
+  const n=participants.length;
+  CH=Math.max(260,n*46+70);
+  canvas.width=CW;canvas.height=CH;
+  LX=Math.round(CW*0.18);RX=Math.round(CW*0.82);
+  TY=36;RH=(CH-70)/Math.max(n,1);
+}
+
+function yOf(i){return TY+i*RH;}
+
+function drawLadder(highlightIdx=-1,dotX=-1,dotY=-1){
+  layout();
+  ctx.clearRect(0,0,CW,CH);
+  const n=participants.length;
+
+  ctx.strokeStyle='#3a3a2a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(LX,TY);ctx.lineTo(LX,TY+(n-1)*RH+RH*.5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(RX,TY);ctx.lineTo(RX,TY+(n-1)*RH+RH*.5);ctx.stroke();
+
+  ctx.strokeStyle='#907830';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+  for(const rg of rungs){
+    const y=TY+rg.row*RH+RH*rg.t;
+    ctx.beginPath();ctx.moveTo(LX,y);ctx.lineTo(RX,y);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  for(let i=0;i<n;i++){
+    const y=yOf(i);
+    const p=participants[i];
+    const isSel=(i===highlightIdx);
+    const isDone=animDone.includes(i);
+
+    ctx.font=`${isSel?'500 ':''}13px monospace`;
+    ctx.textAlign='right';
+    ctx.fillStyle=isSel?'#5a3a10':(isDone?'#2a6a30':'#3a3a2a');
+    ctx.fillText(`${String(p.seq).padStart(2,'0')} ${p.name}`,LX-10,y+4);
+
+    ctx.beginPath();ctx.arc(LX,y,4,0,Math.PI*2);
+    ctx.fillStyle=isSel?'#e8b840':(isDone?'#4aaa60':'#f8f4e8');
+    ctx.fill();ctx.strokeStyle='#3a3a2a';ctx.lineWidth=1.5;ctx.stroke();
+
+    const ri=rightOrder[i];
+    const box=participants[ri]?assignments[participants[ri].name]:null;
+    if(box){
+      const col=box.type==='f'?'#0f6e56':box.type==='c'?'#185fa5':'#993c1d';
+      ctx.fillStyle=isDone?col:'#b0a878';
+      ctx.font='12px monospace';ctx.textAlign='left';
+      ctx.fillText(isDone?box.name:'???',RX+10,yOf(i)+4);
+    }
+    ctx.beginPath();ctx.arc(RX,yOf(i),4,0,Math.PI*2);
+    ctx.fillStyle=isDone?'#4aaa60':'#f8f4e8';
+    ctx.fill();ctx.strokeStyle='#3a3a2a';ctx.lineWidth=1.5;ctx.stroke();
+  }
+
+  if(dotX>=0&&dotY>=0){
+    ctx.beginPath();ctx.arc(dotX,dotY,7,0,Math.PI*2);
+    ctx.fillStyle='#e8a020';ctx.fill();
+    ctx.strokeStyle='#3a3a2a';ctx.lineWidth=1.5;ctx.stroke();
+  }
+}
+
+function renderChips(){
+  const el=document.getElementById('chips');
+  if(!participants.length){el.innerHTML='<span class="hint">等待同仁掃碼登記…</span>';return;}
+  el.innerHTML=participants.map((p,i)=>{
+    const done=animDone.includes(i);
+    const sel=selected===i;
+    const bg=done?'#c8e8c0':sel?'#f0d870':'#e4dfbc';
+    const bc=done?'#6aaa60':sel?'#a07020':'#a8a070';
+    return `<div class="chip" style="background:${bg};border-color:${bc};cursor:${done||climbing?'default':'pointer'};"
+      onclick="selectP(${i})">
+      <span class="chip-no">${String(p.seq).padStart(2,'0')}</span>${p.name}${done?' ✓':''}
+    </div>`;
+  }).join('');
+}
+
+function selectP(i){
+  if(climbing||animDone.includes(i))return;
+  selected=i;
+  document.getElementById('playBtn').disabled=false;
+  document.getElementById('gameLbl').textContent=`▌ 已選：${participants[i].name}　→ 按「開始爬！」`;
+  renderChips();drawLadder(i);
+}
+
+function startClimb(){
+  if(selected===null||climbing)return;
+  climbing=true;
+  document.getElementById('playBtn').disabled=true;
+  document.getElementById('gameLbl').textContent='▌ 爬梯中…';
+  const idx=selected;
+  const n=participants.length;
+  let path=[{x:LX,y:yOf(idx)}];
+  let curRow=idx;
+
+  for(let step=0;step<n+rungs.length+2;step++){
+    const curY=yOf(curRow);
+    let hit=null;
+    for(const rg of rungs){
+      if(rg.row===curRow){
+        const ry=TY+rg.row*RH+rg.t*RH;
+        if(ry>curY){hit=rg;break;}
+      }
+    }
+    if(hit){
+      const ry=TY+hit.row*RH+hit.t*RH;
+      path.push({x:LX,y:ry});
+      path.push({x:RX,y:ry});
+      path.push({x:RX,y:yOf(hit.row+1<n?hit.row+1:hit.row)});
+      break;
+    }
+    if(curRow+1<n){curRow++;path.push({x:LX,y:yOf(curRow)});}
+    else break;
+  }
+  path.push({x:RX,y:yOf(curRow)});
+
+  let seg=0,t=0;
+  const speed=2.5;
+  function animate(){
+    if(seg>=path.length-1){
+      animDone.push(idx);
+      climbing=false;selected=null;
+      renderChips();drawLadder();
+      document.getElementById('gameLbl').textContent='▌ 完成！點選下一位同仁繼續';
+      if(animDone.length===participants.length) showAllResults();
+      return;
+    }
+    const a=path[seg],b=path[seg+1];
+    const dx=b.x-a.x,dy=b.y-a.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    t+=speed;
+    if(t>=dist){t=0;seg++;}
+    const ratio=dist>0?Math.min(t/dist,1):1;
+    drawLadder(idx,a.x+dx*ratio,a.y+dy*ratio);
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function showAllResults(){
+  const el=document.getElementById('resultReveal');
+  el.classList.add('show');
+  document.getElementById('revGrid').innerHTML=participants.map((p,i)=>{
+    const ri=rightOrder[i];
+    const box=participants[ri]?assignments[participants[ri].name]:null;
+    if(!box)return'';
+    return `<div class="rev-card">
+<div class="rc-no">地號 ${String(p.seq).padStart(2,'0')}</div>
+<div class="rc-name">${p.name}</div>
+<div class="rc-arch">${box.name}</div>
+<div class="rc-en">${box.en}</div>
+<div><span class="rc-badge ${TC[box.type]}">${TL[box.type]}</span></div>
+<div class="rc-desc">${box.desc}</div>
+</div>`;
+  }).join('');
+}
+
+function resetGame(){
+  if(!confirm('確定要重置？爬梯子進度將清除（名單保留）。'))return;
+  selected=null;climbing=false;animDone=[];
+  renderChips();
+  const el=document.getElementById('resultReveal');
+  el.classList.remove('show');
+  document.getElementById('revGrid').innerHTML='';
+  document.getElementById('playBtn').disabled=true;
+  document.getElementById('gameLbl').textContent='▌ 點選上方姓名，再按「開始爬！」';
+  drawLadder();
+}
+
+fetchNames();
+setInterval(fetchNames, SYNC_INTERVAL);
+</script>
+</body>
+</html>
